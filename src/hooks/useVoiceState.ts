@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { setupSpeechRecognition } from '../utils/speech/speechRecognition';
-import { speak, cancelSpeech } from '../utils/speech/speechSynthesis';
+import { speak, cancelSpeech, isSpeechActive } from '../utils/speech/speechSynthesis';
 import type { SpeechError } from '../utils/speech/types';
 
 interface UseVoiceStateProps {
@@ -73,7 +73,6 @@ export function useVoiceState({ onSpeechResult, lastBotMessage }: UseVoiceStateP
 
       speak(lastBotMessage)
         .catch((error: SpeechError) => {
-          // Only show error for non-interruption errors
           if (error.type === 'synthesis' && error.originalError?.error !== 'interrupted') {
             console.error('Speech error:', error);
             setError(error.message);
@@ -110,7 +109,7 @@ export function useVoiceState({ onSpeechResult, lastBotMessage }: UseVoiceStateP
 
   const toggleMute = useCallback(() => {
     setIsMuted(prev => {
-      if (!prev) {
+      if (!prev && isSpeechActive()) {
         cancelSpeech();
       }
       return !prev;

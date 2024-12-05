@@ -88,21 +88,6 @@ export async function speak(text: string, config: Partial<SpeechConfig> = {}): P
           reject(createSpeechError('Speech synthesis failed', event));
         };
 
-        // Safety timeout
-        const timeout = setTimeout(() => {
-          if (isSpeaking) {
-            cancelSpeech();
-            reject(createSpeechError('Speech synthesis timeout'));
-          }
-        }, 10000);
-
-        utterance.onend = () => {
-          clearTimeout(timeout);
-          currentUtterance = null;
-          isSpeaking = false;
-          resolve();
-        };
-
         window.speechSynthesis.speak(utterance);
       } catch (error) {
         reject(createSpeechError('Speech synthesis initialization failed', error));
@@ -130,3 +115,11 @@ setInterval(() => {
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', cancelSpeech);
+
+export function isSpeechActive(): boolean {
+  return isSpeaking;
+}
+
+export function getCurrentUtterance(): SpeechSynthesisUtterance | null {
+  return currentUtterance;
+}
