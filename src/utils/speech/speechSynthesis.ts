@@ -3,6 +3,7 @@ import { voiceManager } from './voiceManager';
 
 let currentUtterance: SpeechSynthesisUtterance | null = null;
 let isSpeaking = false;
+let hasSpokenInitialGreeting = false;
 
 const defaultConfig: SpeechConfig = {
   lang: 'pt-PT',
@@ -34,8 +35,30 @@ function cleanText(text: string): string {
 }
 
 export async function speak(text: string, config: Partial<SpeechConfig> = {}): Promise<void> {
-  if (!text.trim()) return;
+  if (!text.trim()) return Promise.resolve();
 
+  // Special handling for initial greeting
+  const isInitialGreeting = !hasSpokenInitialGreeting && 
+    text === "Olá! Sou seu assistente de inteligência artificial. Como posso ajudar hoje?";
+
+  if (isInitialGreeting) {
+    hasSpokenInitialGreeting = true;
+    // For the initial greeting, we'll wait a bit to ensure speech synthesis is ready
+    return new Promise(resolve => {
+      setTimeout(() => {
+        speakWithRetry(text, config).catch(() => {
+          // Silently handle errors for initial greeting
+          resolve();
+        });
+        resolve();
+      }, 1000);
+    });
+  }
+
+  return speakWithRetry(text, config);
+}
+
+async function speakWithRetry(text: string, config: Partial<SpeechConfig>, retries = 2): Promise<void> {
   // Cancel any ongoing speech
   cancelSpeech();
 
@@ -74,18 +97,30 @@ export async function speak(text: string, config: Partial<SpeechConfig> = {}): P
           resolve();
         };
 
-        utterance.onerror = (event) => {
-          // Ignore interrupted errors as they're usually intentional
+        utterance.onerror = async (event) => {
+          // Handle interruptions gracefully
           if (event.error === 'interrupted') {
             currentUtterance = null;
             isSpeaking = false;
-            resolve(); // Resolve instead of reject for interruptions
+            resolve();
             return;
           }
 
-          currentUtterance = null;
-          isSpeaking = false;
-          reject(createSpeechError('Speech synthesis failed', event));
+          // For other errors, try to retry if possible
+          if (retries > 0) {
+            currentUtterance = null;
+            isSpeaking = false;
+            try {
+              await speakWithRetry(text, config, retries - 1);
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          } else {
+            currentUtterance = null;
+            isSpeaking = false;
+            reject(createSpeechError('Speech synthesis failed', event));
+          }
         };
 
         window.speechSynthesis.speak(utterance);
