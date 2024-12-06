@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, Send } from 'lucide-react';
+import { GraduationCap, Send, FileText } from 'lucide-react';
 import VoiceAssistant from './components/voice/VoiceAssistant';
 import ChatMessage from './components/ChatMessage';
 import AlzheimerAnalysisNotes from './components/AlzheimerAnalysisNotes';
@@ -8,6 +8,7 @@ import ConversationControls from './components/ConversationControls';
 import HealthDashboard from './components/health/HealthDashboard';
 import MedicalDashboard from './components/medical/MedicalDashboard';
 import { getChatGPTResponse } from './utils/openai';
+import { downloadCompleteReport } from './utils/reportGenerator';
 import type { NeurologicalAssessment } from './types/medical';
 
 interface Message {
@@ -27,6 +28,7 @@ function App() {
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [assessments, setAssessments] = useState<NeurologicalAssessment[]>([]);
+  const [patientName, setPatientName] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -85,6 +87,34 @@ function App() {
     setAssessments(prev => [newAssessment, ...prev]);
   };
 
+  const handleGenerateReport = () => {
+    if (!patientName) {
+      const name = window.prompt('Por favor, insira o nome do paciente:');
+      if (!name) return;
+      setPatientName(name);
+    }
+
+    // Get all required data
+    const labResults = JSON.parse(localStorage.getItem('labResults') || '[]');
+    const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    const medications = JSON.parse(localStorage.getItem('medications') || '[]');
+    const activities = JSON.parse(localStorage.getItem('dailyActivities') || '[]');
+    const cognitiveNotes = JSON.parse(localStorage.getItem('tutorNotes') || '[]');
+    const treatmentPlans = JSON.parse(localStorage.getItem('treatmentPlans') || '[]');
+
+    downloadCompleteReport({
+      patientName: patientName,
+      messages,
+      assessments,
+      treatmentPlans,
+      labResults,
+      appointments,
+      medications,
+      activities,
+      cognitiveNotes
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       <VoiceAssistant
@@ -104,16 +134,25 @@ function App() {
                 SANA+ Sistema de Avaliação Neurológica do Alzheimer
               </h1>
             </div>
-            <ConversationControls 
-              messages={messages}
-              cognitiveAnalysis={{
-                timeOrientation: 8,
-                speechCoherence: 7,
-                memoryConsistency: 6,
-                emotionalState: 'Estável',
-                concerns: []
-              }}
-            />
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleGenerateReport}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+              >
+                <FileText className="w-5 h-5" />
+                <span>Gerar Relatório</span>
+              </button>
+              <ConversationControls 
+                messages={messages}
+                cognitiveAnalysis={{
+                  timeOrientation: 8,
+                  speechCoherence: 7,
+                  memoryConsistency: 6,
+                  emotionalState: 'Estável',
+                  concerns: []
+                }}
+              />
+            </div>
           </div>
         </div>
       </header>

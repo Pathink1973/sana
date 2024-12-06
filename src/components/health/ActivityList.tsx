@@ -1,6 +1,7 @@
 import React from 'react';
-import { CheckCircle, Circle, Clock, Brain, Utensils, Heart, Users, Bath } from 'lucide-react';
+import { CheckCircle, Circle, Clock, Brain, Utensils, Heart, Users, Bath, Trash2 } from 'lucide-react';
 import { DailyActivity } from '../../types/health';
+import { routineManager } from '../../utils/health/routineManager';
 
 interface ActivityListProps {
   activities: DailyActivity[];
@@ -31,6 +32,14 @@ export default function ActivityList({ activities, onActivityComplete }: Activit
         return 'text-yellow-600 bg-yellow-50';
       case 'low':
         return 'text-green-600 bg-green-50';
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta atividade?')) {
+      routineManager.removeActivity(id);
+      // Refresh the activities list by reloading the page
+      window.location.reload();
     }
   };
 
@@ -73,11 +82,20 @@ export default function ActivityList({ activities, onActivityComplete }: Activit
               )}
             </div>
 
-            {activity.completed && activity.timeCompleted && (
-              <span className="text-sm text-gray-500">
-                Concluído às {new Date(activity.timeCompleted).toLocaleTimeString()}
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {activity.completed && activity.timeCompleted && (
+                <span className="text-sm text-gray-500">
+                  Concluído às {new Date(activity.timeCompleted).toLocaleTimeString()}
+                </span>
+              )}
+              <button
+                onClick={() => handleDelete(activity.id)}
+                className="p-2 rounded-full hover:bg-red-100 text-red-600 transition-colors"
+                title="Excluir atividade"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {activity.notes && (

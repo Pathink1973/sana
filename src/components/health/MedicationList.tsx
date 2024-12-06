@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Check, AlertTriangle } from 'lucide-react';
+import { Clock, Check, AlertTriangle, Trash2 } from 'lucide-react';
 import { Medication } from '../../types/health';
 import { medicationManager } from '../../utils/health/medicationManager';
 
@@ -12,6 +12,14 @@ export default function MedicationList({ medications, onMedicationTaken }: Medic
   const isOverdue = (medication: Medication) => {
     if (!medication.nextDue) return false;
     return new Date(medication.nextDue) < new Date();
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta medicação?')) {
+      medicationManager.removeMedication(id);
+      // Refresh the medications list by reloading the page
+      window.location.reload();
+    }
   };
 
   return (
@@ -28,12 +36,22 @@ export default function MedicationList({ medications, onMedicationTaken }: Medic
               <h3 className="font-medium text-gray-900">{medication.name}</h3>
               <p className="text-sm text-gray-600">{medication.dosage}</p>
             </div>
-            <button
-              onClick={() => onMedicationTaken(medication.id)}
-              className="p-2 rounded-full hover:bg-green-100 text-green-600 transition-colors"
-            >
-              <Check className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onMedicationTaken(medication.id)}
+                className="p-2 rounded-full hover:bg-green-100 text-green-600 transition-colors"
+                title="Marcar como tomado"
+              >
+                <Check className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => handleDelete(medication.id)}
+                className="p-2 rounded-full hover:bg-red-100 text-red-600 transition-colors"
+                title="Excluir medicação"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
           </div>
           
           <div className="mt-2 flex items-center gap-4 text-sm">
