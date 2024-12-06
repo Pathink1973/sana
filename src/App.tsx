@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, Send, FileText } from 'lucide-react';
+import { Brain, Send, FileText } from 'lucide-react';
 import VoiceAssistant from './components/voice/VoiceAssistant';
 import ChatMessage from './components/ChatMessage';
 import AlzheimerAnalysisNotes from './components/AlzheimerAnalysisNotes';
@@ -128,7 +128,7 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="bg-gradient-to-br from-purple-500 to-indigo-500 p-2 rounded-lg">
-                <GraduationCap className="w-6 h-6 text-white" />
+                <Brain className="w-6 h-6 text-white" />
               </div>
               <h1 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 SANA+ Sistema de Avaliação Neurológica do Alzheimer
