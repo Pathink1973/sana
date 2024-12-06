@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Save } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Plus, Save, Upload } from 'lucide-react';
 
 interface AddLabResultFormProps {
   onSubmit: (result: {
@@ -7,7 +7,7 @@ interface AddLabResultFormProps {
     doctor: string;
     date: string;
     result: string;
-    attachmentUrl?: string;
+    attachment?: File;
   }) => void;
 }
 
@@ -18,8 +18,9 @@ export default function AddLabResultForm({ onSubmit }: AddLabResultFormProps) {
     doctor: '',
     date: new Date().toISOString().split('T')[0],
     result: '',
-    attachmentUrl: ''
+    attachment: undefined as File | undefined
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,9 +30,16 @@ export default function AddLabResultForm({ onSubmit }: AddLabResultFormProps) {
       doctor: '',
       date: new Date().toISOString().split('T')[0],
       result: '',
-      attachmentUrl: ''
+      attachment: undefined
     });
     setShowForm(false);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, attachment: file }));
+    }
   };
 
   if (!showForm) {
@@ -95,14 +103,30 @@ export default function AddLabResultForm({ onSubmit }: AddLabResultFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">URL do Anexo (opcional)</label>
-        <input
-          type="url"
-          value={formData.attachmentUrl}
-          onChange={e => setFormData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-          placeholder="https://..."
-        />
+        <label className="block text-sm font-medium text-gray-700">Anexo (opcional)</label>
+        <div className="mt-1 flex items-center">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Escolher arquivo</span>
+          </button>
+          <span className="ml-4 text-sm text-gray-500">
+            {formData.attachment?.name || 'Nenhum arquivo selecionado'}
+          </span>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".pdf,.txt,.doc,.docx,.jpg,.jpeg,.png"
+            className="hidden"
+          />
+        </div>
+        <p className="mt-1 text-xs text-gray-500">
+          Formatos aceitos: PDF, TXT, DOC, DOCX, JPG, JPEG, PNG
+        </p>
       </div>
 
       <div className="flex justify-end space-x-2">

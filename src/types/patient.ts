@@ -22,7 +22,7 @@ interface LabResult {
   doctor: string;
   date: string;
   result?: string;
-  attachmentUrl?: string;
+  attachment?: File;
 }
 
 interface TreatmentProgress {

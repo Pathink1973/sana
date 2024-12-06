@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Trash2 } from 'lucide-react';
+import { FileText, Trash2 } from 'lucide-react';
 import { LabResult } from '../../../types/patient';
 
 interface LabResultItemProps {
@@ -8,6 +8,20 @@ interface LabResultItemProps {
 }
 
 export default function LabResultItem({ result, onDelete }: LabResultItemProps) {
+  const handleDownload = () => {
+    if (result.attachment) {
+      // Create a URL for the blob
+      const url = URL.createObjectURL(result.attachment);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = result.attachment.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
   return (
     <div className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-100">
       <div>
@@ -19,16 +33,14 @@ export default function LabResultItem({ result, onDelete }: LabResultItemProps) 
         )}
       </div>
       <div className="flex items-center gap-2">
-        {result.attachmentUrl && (
-          <a
-            href={result.attachmentUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+        {result.attachment && (
+          <button
+            onClick={handleDownload}
             className="p-2 text-blue-600 hover:text-blue-800 transition-colors"
             title="Download anexo"
           >
-            <Download className="w-5 h-5" />
-          </a>
+            <FileText className="w-5 h-5" />
+          </button>
         )}
         <button
           onClick={() => onDelete(result.id)}
