@@ -37,30 +37,7 @@ O médico acessa os registros coletados, anota observações e acompanha a evolu
 Geração do relatório:
 
 No final da consulta, o sistema gera um documento (TXT) consolidando todas as informações relevantes, pronto para ser entregue ao cuidador ou adicionado ao prontuário médico.
-Como Contribuir
-Clone o repositório:
-bash
-Copiar código
-git clone https://github.com/seu-usuario/sana.git
-Crie uma nova branch para suas alterações:
-bash
-Copiar código
-git checkout -b minha-feature
-Implemente suas mudanças e faça commit:
-bash
-Copiar código
-git add .
-git commit -m "Descrição das alterações"
-Envie sua branch para revisão:
-bash
-Copiar código
-git push origin minha-feature
-Abra um Pull Request no GitHub.
-Alterações Recentes
-Funcionalidades Adicionadas
-Relatórios Médicos: Geração automática de documentos em formato TXT com as observações feitas durante consultas.
-Histórico Clínico: Registro e acompanhamento de dados ao longo do tempo.
-Licença
+
 Este projeto está licenciado sob a Licença MIT. Para mais detalhes, consulte o arquivo LICENSE.
 
 Autoria de Patrício Brito © 2024
