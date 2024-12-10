@@ -62,3 +62,5 @@ Relatórios Médicos: Geração automática de documentos em formato TXT com as 
 Histórico Clínico: Registro e acompanhamento de dados ao longo do tempo.
 Licença
 Este projeto está licenciado sob a Licença MIT. Para mais detalhes, consulte o arquivo LICENSE.
+
+Autoria de Patrício Brito © 2024
