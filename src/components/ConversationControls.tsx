@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Save, FileText, AlertTriangle } from 'lucide-react';
 import { Conversation } from '../types/conversation';
 import { downloadConversation } from '../utils/conversationExport';
+import { HelpDialog } from './HelpDialog';
 
 interface ConversationControlsProps {
   messages: { text: string; isBot: boolean; timestamp: string; }[];
@@ -40,13 +41,16 @@ export default function ConversationControls({ messages, cognitiveAnalysis }: Co
 
   if (!showForm) {
     return (
-      <button
-        onClick={() => setShowForm(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-      >
-        <Save size={18} />
-        <span>Salvar Conversa</span>
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setShowForm(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+        >
+          <Save size={18} />
+          <span>Salvar Conversa</span>
+        </button>
+        <HelpDialog />
+      </div>
     );
   }
 
